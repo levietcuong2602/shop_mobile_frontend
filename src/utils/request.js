@@ -1,10 +1,12 @@
 import axios from "axios";
+
 import { getToken, setToken } from "./auth";
 const BASE_URL = process.env.REACT_APP_APIKEY;
 // Create axios instance
 const service = axios.create({
   baseURL: BASE_URL,
   timeout: 120000, // Request timeout
+  responseType: "json",
 });
 
 // request拦截器
