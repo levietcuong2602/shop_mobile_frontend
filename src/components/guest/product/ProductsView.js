@@ -234,12 +234,23 @@ class ProductsView extends Component {
     this.prevPage = this.prevPage.bind(this);
   }
 
-  getProductGuest({ limit, pageNum, inputSearch, productType, providerId }) {
+  getProductGuest({
+    limit,
+    pageNum,
+    inputSearch,
+    productType,
+    providerId,
+    storageValue,
+    order,
+  }) {
     getProducts({
       pageNum,
       limit,
       inputSearch,
       productType,
+      providerId,
+      storageValue,
+      order,
     })
       .then((res) => {
         const { status, results } = res;
@@ -303,7 +314,7 @@ class ProductsView extends Component {
   componentDidMount() {
     const limit = this.state.limit;
     const pageNum = this.state.currentPage;
-    const product_type_id = this.props.product_type_id;
+    const productTypeId = this.props.product_type_id;
     this.getProductGuest({
       limit,
       pageNum,
@@ -311,7 +322,7 @@ class ProductsView extends Component {
       productType: this.props.product_type_id,
     });
 
-    this.getProviderGuest(product_type_id);
+    this.getProviderGuest(productTypeId);
   }
 
   componentWillMount() {
@@ -386,13 +397,15 @@ class ProductsView extends Component {
     );
   }
 
-  handleSortProducts(sort) {
+  handleSortProductByPrice(e) {
     const { limit, currentPage } = this.state;
+    const sort = e.target.value;
 
     this.getProductGuest({
       limit,
       pageNum: currentPage,
       productType: this.props.product_type_id,
+      order: `base_price,${sort}`,
     });
   }
 
@@ -403,6 +416,7 @@ class ProductsView extends Component {
       limit,
       pageNum: currentPage,
       productType: product_type_id,
+      providerId,
     });
   }
 
@@ -426,12 +440,14 @@ class ProductsView extends Component {
     });
   }
 
-  handleSortStorage(storage) {
+  handleSortStorage(storageValue) {
+    console.log({ storageValue });
     const { limit, currentPage, product_type_id } = this.state;
     this.getProductGuest({
       limit,
       pageNum: currentPage,
       productType: product_type_id,
+      storageValue,
     });
   }
   render() {
@@ -466,7 +482,10 @@ class ProductsView extends Component {
               <ul>
                 {providers.map((provider, key) => (
                   <li
-                    onClick={() => this.handlerSortProvider(provider.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.handlerSortProvider(provider.id);
+                    }}
                     key={key}
                   >
                     <a href="#"> {provider.name} </a>
@@ -516,7 +535,10 @@ class ProductsView extends Component {
               <ul>
                 {attributes.map((attribute, key) => (
                   <li
-                    onClick={() => this.handleSortStorage(attribute.value)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.handleSortStorage(attribute.value);
+                    }}
                     key={key}
                   >
                     <a href="#"> {attribute.value} </a>
@@ -533,10 +555,10 @@ class ProductsView extends Component {
                 <div className="selection">
                   <select
                     className="selectpicker"
-                    onChange={(e) => this.handleSortProducts(e)}
+                    onChange={(e) => this.handleSortProductByPrice(e)}
                   >
-                    <option value="asc">Price low to hight</option>
-                    <option value="desc">Price hight to low</option>
+                    <option value="ASC">Price low to hight</option>
+                    <option value="DESC">Price hight to low</option>
                   </select>
                 </div>
 
