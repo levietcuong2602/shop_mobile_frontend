@@ -23,7 +23,7 @@ class ProductList extends Component {
     this.state = {
       products: [],
       currentPage: 1,
-      limit: 4,
+      limit: 10,
       totalCount: "",
       hasPrev: "",
       hasNext: "",

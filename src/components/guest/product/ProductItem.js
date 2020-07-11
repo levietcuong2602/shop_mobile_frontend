@@ -1,7 +1,10 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { connect } from "react-redux";
+import { useSnackbar } from "notistack";
 
-import { formatNumber } from '../../../helpers/formatNumber';
+import { formatNumber } from "../../../helpers/formatNumber";
+import { addCarts } from "./../../../apis/carts";
 
 const Container = styled.div`
     border: 1px solid #e1e1e1;
@@ -99,25 +102,70 @@ const Container = styled.div`
 }
 `;
 
-class ProductItem extends Component {
-    render() {
-        const { id, product_name, product_images, base_price, unit } = this.props.product;
-        const product_image = product_images.split(',')[0];
+function ProductItem(props) {
+  const {
+    product: { id, product_name, product_images, base_price, unit, quantity },
+    user,
+  } = props;
 
-        return (
-            <Container className="products">
-                <div className="thumbnail">
-                    <a href={"/product/detail/" + id}><img src={product_image} alt="Product Name" /></a>
-                </div>
-                <div className="productname">{product_name}</div>
-                <h4 className="price">{formatNumber(base_price)} {unit}</h4>
-                <div className="button_group">
-                    <button className="button add-cart" type="button">Add To Cart</button>
-                    <button className="button wishlist" type="button"><i className="fa fa-heart-o"></i></button>
-                </div>
-            </Container>
-        )
-    }
+  const { enqueueSnackbar } = useSnackbar();
+  const product_image = product_images.split(",")[0];
+
+  const handleAddCarts = () => {
+    const data = {
+      customerId: user.id,
+      productId: id,
+      amount: quantity,
+    };
+
+    addCarts(data)
+      .then((res) => {
+        const { status } = res;
+        if (status === 1) {
+          enqueueSnackbar("Thêm vào giỏ hàng thành công", {
+            variant: "success",
+          });
+          return;
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar("Có lỗi xảy ra. Vui lòng thử lại", {
+          variant: "error",
+        });
+      });
+  };
+
+  return (
+    <Container className="products">
+      <div className="thumbnail">
+        <a href={"/product/detail/" + id}>
+          <img src={product_image} alt="Product Name" />
+        </a>
+      </div>
+      <div className="productname">{product_name}</div>
+      <h4 className="price">
+        {formatNumber(base_price)} {unit}
+      </h4>
+      <div className="button_group">
+        <button
+          className="button add-cart"
+          type="button"
+          onClick={handleAddCarts}
+        >
+          Add To Cart
+        </button>
+        <button className="button wishlist" type="button">
+          <i className="fa fa-heart-o"></i>
+        </button>
+      </div>
+    </Container>
+  );
 }
 
-export default ProductItem;
+function mapStateToProps(state) {
+  return {
+    user: state.auth.user,
+  };
+}
+
+export default connect(mapStateToProps)(ProductItem);
