@@ -9,7 +9,7 @@
     "@types/markerclustererplus": "2.1.33",
     "ajv": "^5.0.0",
     "axios": "^0.18.0",
-    "bcrypt": "^3.0.0",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.18.3",
     "bootstrap": "^3.3.7",
     "camelcase": "^6.0.0",
